@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title description">
+  <title id="title">一日</title>
+  <desc id="description">一日生活时间规划工具标志</desc>
+  <rect width="512" height="512" rx="142" fill="#284337"/>
+  <path d="M150 142h212v228H150z" fill="none" stroke="#f4f3ef" stroke-width="28" stroke-linejoin="round"/>
+  <path d="M178 218h156M178 278h112" stroke="#f4f3ef" stroke-width="26" stroke-linecap="round"/>
+  <circle cx="334" cy="329" r="55" fill="#e3a96d"/>
+  <path d="M334 296v34l22 15" fill="none" stroke="#284337" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
