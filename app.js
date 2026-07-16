@@ -394,7 +394,16 @@ function resetForm(defaultSchedule = "inbox") {
   document.querySelector("#seriesScopeField").hidden = true;
   document.querySelector('#seriesScopeOptions input[value="occurrence"]').checked = true;
   document.querySelector("#itemRepeat").disabled = false;
-  document.querySelector("#advancedToggle").…133 tokens truncated…30) {
+  document.querySelector("#advancedToggle").setAttribute("aria-expanded", "false");
+  const radio = itemForm.querySelector(`input[name="schedule"][value="${defaultSchedule}"]`);
+  if (radio) radio.checked = true;
+  const targetDate = defaultSchedule === "tomorrow" ? toDateKey(addDays(new Date(), 1)) : state.selectedDate;
+  document.querySelector("#itemTime").value = nextAvailableTime(targetDate, 30) || fallbackManualTime(targetDate, 30);
+  document.querySelector("#itemDuration").value = "30";
+  updateScheduleFields();
+}
+
+function fallbackManualTime(dateKey, duration = 30) {
   const start = minutesFromTime(state.settings.dayStart);
   const end = minutesFromTime(state.settings.dayEnd);
   const now = new Date();
@@ -809,4 +818,3 @@ app.addEventListener("change", async (event) => {
 });
 
 render();
-
