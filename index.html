@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f4f3ef" />
+    <meta name="description" content="一日是一款面向手机用户的免费生活时间规划工具，把今天要做的事清楚地放进时间里。" />
+    <title>一日｜生活时间规划</title>
+    <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <main id="app" aria-live="polite"></main>
+
+      <button class="fab" id="addButton" type="button" aria-label="添加事项">
+        <span aria-hidden="true">＋</span>
+      </button>
+
+      <nav class="bottom-nav" aria-label="主导航">
+        <button class="nav-item is-active" type="button" data-page="today">
+          <span class="nav-icon nav-icon-today" aria-hidden="true"></span>
+          <span>今天</span>
+        </button>
+        <button class="nav-item" type="button" data-page="inbox">
+          <span class="nav-icon nav-icon-inbox" aria-hidden="true"></span>
+          <span>待安排</span>
+          <span class="nav-badge" id="inboxBadge" hidden></span>
+        </button>
+        <button class="nav-item" type="button" data-page="profile">
+          <span class="nav-icon nav-icon-profile" aria-hidden="true"></span>
+          <span>我的</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="scrim" id="scrim" hidden></div>
+
+    <section class="welcome" id="welcome" aria-modal="true" role="dialog" aria-labelledby="welcomeTitle" hidden>
+      <div class="welcome-mark"><img src="assets/logo.svg" alt="" /></div>
+      <p class="eyebrow">欢迎使用一日</p>
+      <h1 id="welcomeTitle">先把今天安排清楚</h1>
+      <p class="welcome-copy">不需要注册，也不用先学习复杂系统。记录一件事，把它放进时间里，计划变化时再轻松调整。</p>
+      <div class="welcome-points">
+        <span><b>1</b>快速记下要做的事</span>
+        <span><b>2</b>安排进真实可用时间</span>
+        <span><b>3</b>完成或重新安排</span>
+      </div>
+      <div class="welcome-actions">
+        <button class="primary-button" id="startClean" type="button">开始自己的计划</button>
+        <button class="secondary-button" id="loadExample" type="button">先看看示例</button>
+      </div>
+      <small>数据只保存在当前浏览器中</small>
+    </section>
+
+    <section class="bottom-sheet" id="itemSheet" aria-modal="true" role="dialog" aria-labelledby="sheetTitle" hidden>
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="sheet-header">
+        <div>
+          <p class="eyebrow">快速记录</p>
+          <h2 id="sheetTitle">添加事项</h2>
+        </div>
+        <button class="icon-button" id="closeSheet" type="button" aria-label="关闭">×</button>
+      </div>
+
+      <form id="itemForm">
+        <input type="hidden" id="editingId" />
+        <input type="hidden" id="editingOccurrenceDate" />
+        <label class="field field-title">
+          <span>要做什么？</span>
+          <input id="itemTitle" name="title" maxlength="60" autocomplete="off" placeholder="例如：复习英语单词" required />
+        </label>
+
+        <fieldset class="field">
+          <legend>安排到</legend>
+          <div class="segmented" id="scheduleOptions">
+            <label><input type="radio" name="schedule" value="inbox" checked /><span>待安排</span></label>
+            <label><input type="radio" name="schedule" value="today" /><span>今天</span></label>
+            <label><input type="radio" name="schedule" value="tomorrow" /><span>明天</span></label>
+            <label><input type="radio" name="schedule" value="custom" /><span>指定日期</span></label>
+          </div>
+        </fieldset>
+
+        <div class="schedule-fields" id="scheduleFields" hidden>
+          <label class="field" id="dateField" hidden>
+            <span>日期</span>
+            <input id="itemDate" type="date" />
+          </label>
+          <div class="field-row">
+            <label class="field">
+              <span>开始时间</span>
+              <input id="itemTime" type="time" value="09:00" />
+            </label>
+            <label class="field">
+              <span>预计时长</span>
+              <select id="itemDuration">
+                <option value="15">15 分钟</option>
+                <option value="30" selected>30 分钟</option>
+                <option value="45">45 分钟</option>
+                <option value="60">1 小时</option>
+                <option value="90">1.5 小时</option>
+                <option value="120">2 小时</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="conflict-warning" id="conflictWarning" role="status" hidden></div>
+
+        <button class="advanced-toggle" id="advancedToggle" type="button" aria-expanded="false">
+          更多选项 <span aria-hidden="true">⌄</span>
+        </button>
+        <div class="advanced-fields" id="advancedFields" hidden>
+          <div class="series-notice" id="seriesNotice" hidden>请选择这次修改影响的范围。</div>
+          <fieldset class="field series-scope-field" id="seriesScopeField" hidden>
+            <legend>修改范围</legend>
+            <div class="segmented series-scope" id="seriesScopeOptions">
+              <label><input type="radio" name="seriesScope" value="occurrence" checked /><span>仅本次</span></label>
+              <label><input type="radio" name="seriesScope" value="future" /><span>本次及以后</span></label>
+              <label><input type="radio" name="seriesScope" value="all" /><span>整个系列</span></label>
+            </div>
+          </fieldset>
+          <label class="switch-row">
+            <span><strong>固定安排</strong><small>防止整理计划时误移动</small></span>
+            <input id="itemLocked" type="checkbox" />
+          </label>
+          <label class="field">
+            <span>重复</span>
+            <select id="itemRepeat">
+              <option value="none">不重复</option>
+              <option value="daily">每天</option>
+              <option value="weekdays">工作日</option>
+              <option value="weekly">每周</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>备注</span>
+            <textarea id="itemNotes" rows="2" maxlength="160" placeholder="可选"></textarea>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button class="danger-button" id="deleteItem" type="button" hidden>删除</button>
+          <button class="primary-button" type="submit">保存事项</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="bottom-sheet action-sheet" id="actionSheet" aria-modal="true" role="dialog" aria-labelledby="actionTitle" hidden>
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="sheet-header">
+        <div>
+          <p class="eyebrow">事项操作</p>
+          <h2 id="actionTitle">事项</h2>
+        </div>
+        <button class="icon-button" id="closeActions" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="action-list">
+        <button id="toggleComplete" type="button"><span>✓</span><b>标记完成</b><small>完成后仍保留在今天</small></button>
+        <button id="editItem" type="button"><span>✎</span><b>编辑详情</b><small>修改时间、时长或重复</small></button>
+        <button id="moveLater" type="button"><span>→</span><b>顺延 30 分钟</b><small>固定安排不会被自动移动</small></button>
+        <button id="moveTomorrow" type="button"><span>↗</span><b>移到明天</b><small>保留原来的开始时间</small></button>
+        <button id="moveInbox" type="button"><span>↓</span><b>放回待安排</b><small>清除日期和时间</small></button>
+      </div>
+      <p class="series-action-note" id="seriesActionNote" hidden>重复事项可以单独完成；修改时间或删除会应用到整个系列。</p>
+    </section>
+
+    <section class="bottom-sheet date-sheet" id="dateSheet" aria-modal="true" role="dialog" aria-labelledby="dateSheetTitle" hidden>
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="sheet-header">
+        <div><p class="eyebrow">快速跳转</p><h2 id="dateSheetTitle">选择日期</h2></div>
+        <button class="icon-button" id="closeDateSheet" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="calendar-toolbar">
+        <button class="round-button" id="previousMonth" type="button" aria-label="上个月">‹</button>
+        <strong id="calendarMonth"></strong>
+        <button class="round-button" id="nextMonth" type="button" aria-label="下个月">›</button>
+      </div>
+      <div class="calendar-weekdays" aria-hidden="true"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+      <div class="calendar-shortcuts">
+        <button type="button" data-calendar-shortcut="today">今天</button>
+        <button type="button" data-calendar-shortcut="tomorrow">明天</button>
+        <button type="button" data-calendar-shortcut="week">一周后</button>
+        <button type="button" data-calendar-shortcut="month">一个月后</button>
+      </div>
+    </section>
+
+    <div class="toast" id="toast" role="status" hidden></div>
+    <script src="src/core.js"></script>
+    <script src="src/store.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
+
