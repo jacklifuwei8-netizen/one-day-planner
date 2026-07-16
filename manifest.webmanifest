@@ -1,0 +1,20 @@
+{
+  "name": "一日｜生活时间规划",
+  "short_name": "一日",
+  "description": "把今天要做的事，清楚地放进时间里。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f3ef",
+  "theme_color": "#284337",
+  "icons": [
+    {
+      "src": "assets/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
+
